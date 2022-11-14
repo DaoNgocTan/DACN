@@ -492,6 +492,47 @@ let sendRemedy = (data) => {
     })
 }
 
+let sendCancel = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.email || !data.doctorId || !data.patientId || !data.timeType
+
+            ) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter'
+                })
+            } else {
+                // update patient status
+                let appointment = await db.Booking.findOne({
+                    where: {
+                        doctorId: data.doctorId,
+                        patientId: data.patientId,
+                        timeType: data.timeType,
+                        statusId: 'S2'
+                    },
+                    raw: false
+                })
+
+                if (appointment) {
+                    appointment.statusId = 'S3';
+                    await appointment.save()
+                }
+
+                //send email remedy
+                await emailService.sendAttachment2(data);
+
+                resolve({
+                    errCode: 0,
+                    errMessage: 'OK'
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
 
 
 module.exports = {
@@ -504,5 +545,6 @@ module.exports = {
     getExtraInforDoctorById: getExtraInforDoctorById,
     getProfileDoctorById: getProfileDoctorById,
     getListPatientForDoctor: getListPatientForDoctor,
-    sendRemedy: sendRemedy
+    sendRemedy: sendRemedy,
+    sendCancel: sendCancel
 }

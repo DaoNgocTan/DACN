@@ -14,7 +14,7 @@ let postBookAppointment = (data) => {
             if (!data.email || !data.doctorId || !data.timeType || !data.date
 
                 || !data.fullName || !data.selectedGender
-                || !data.address
+                || !data.address || !data.phonenumber
 
             ) {
                 resolve({
@@ -43,7 +43,8 @@ let postBookAppointment = (data) => {
                         roleId: 'R3',
                         gender: data.selectedGender,
                         address: data.address,
-                        firstName: data.fullName
+                        firstName: data.fullName,
+                        phonenumber: data.phonenumber,
                     },
                 });
 
@@ -57,6 +58,71 @@ let postBookAppointment = (data) => {
                             patientId: user[0].id,
                             date: data.date,
                             timeType: data.timeType,
+                            token: token
+                        }
+                    })
+                }
+
+                resolve({
+                    errCode: 0,
+                    errMessage: 'Save infor customer succeed'
+                })
+            }
+
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
+let postBookAppointmentHeader = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.email
+
+                || !data.fullName || !data.selectedGender || !data.phoneNumber
+
+            ) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter'
+                })
+            } else {
+
+                // let token = uuidv4();
+                // await emailService.sendSimpleEmail({
+                //     receiverEmail: data.email,
+                //     patientName: data.fullName,
+                //     // time: data.timeString,
+                //     // doctorName: data.doctorName,
+                //     // language: data.language,
+                //     redirectLink: buildUrlEmail(data.doctorId, token)
+                // })
+
+
+
+                //upsert patient
+                let user = await db.User.findOrCreate({
+                    where: { email: data.email },
+                    defaults: {
+                        email: data.email,
+                        roleId: 'R3',
+                        gender: data.selectedGender,
+                        firstName: data.fullName,
+                        phoneNumber: data.phoneNumber,
+                    },
+                });
+
+                //create a booking record
+                if (user && user[0]) {
+                    await db.Booking.findOrCreate({
+                        where: { patientId: user[0].id },
+                        defaults: {
+                            statusId: 'S1',
+                            // doctorId: data.doctorId,
+                            patientId: user[0].id,
+                            // date: data.date,
+                            // timeType: data.timeType,
                             token: token
                         }
                     })
@@ -118,5 +184,6 @@ let postVerifyBookAppointment = (data) => {
 
 module.exports = {
     postBookAppointment: postBookAppointment,
-    postVerifyBookAppointment: postVerifyBookAppointment
+    postVerifyBookAppointment: postVerifyBookAppointment,
+    postBookAppointmentHeader: postBookAppointmentHeader
 }

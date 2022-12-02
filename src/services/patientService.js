@@ -80,7 +80,7 @@ let postBookAppointmentHeader = (data) => {
         try {
             if (!data.email
 
-                || !data.fullName || !data.selectedGender || !data.phoneNumber
+                || !data.fullName || !data.selectedGender || !data.phonenumber
 
             ) {
                 resolve({
@@ -89,15 +89,15 @@ let postBookAppointmentHeader = (data) => {
                 })
             } else {
 
-                // let token = uuidv4();
-                // await emailService.sendSimpleEmail({
-                //     receiverEmail: data.email,
-                //     patientName: data.fullName,
-                //     // time: data.timeString,
-                //     // doctorName: data.doctorName,
-                //     // language: data.language,
-                //     redirectLink: buildUrlEmail(data.doctorId, token)
-                // })
+                let token = uuidv4();
+                await emailService.sendSimpleEmail({
+                    receiverEmail: data.email,
+                    patientName: data.fullName,
+                    // time: data.timeString,
+                    // doctorName: data.doctorName,
+                    // language: data.language,
+                    redirectLink: buildUrlEmail(data.doctorId, token)
+                })
 
 
 
@@ -109,7 +109,7 @@ let postBookAppointmentHeader = (data) => {
                         roleId: 'R3',
                         gender: data.selectedGender,
                         firstName: data.fullName,
-                        phoneNumber: data.phoneNumber,
+                        phonenumber: data.phonenumber,
                     },
                 });
 
